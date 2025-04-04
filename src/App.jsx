@@ -1,33 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+import {
+  initGapiClient,
+  signIn,
+  listFilters
+} from './gmailClient'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
 
+  const [filters, setFilters] = useState([]);
+
+  useEffect(()=> {
+    initGapiClient().then(()=> {
+      signIn().then(()=> {
+        listFilters().then((response) => {
+          setFilters(response.result.filter || [] );
+        })
+      })
+    })
+  }, [])
+  
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>Email Filter Manager</h1>
+      <h2>Filters</h2>
+      <ul>
+        {filters.map((filter) => (
+          <li key={filter.id}>
+            {filter.criteria?.from || "no criteria"} - {filter.action?.addlabelIds?.join(", ")}
+          </li>
+        ))}
+      </ul>
     </>
   )
 }
