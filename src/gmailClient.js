@@ -1,7 +1,10 @@
 import { gapi } from "gapi-script";
 
 const CLIENT_ID = "10934111227-ncgvgn28puprl174798i19ia9pif5ior.apps.googleusercontent.com"
-const SCOPES = "https://www.googleapis.com/auth/gmail.settings.basic";
+const SCOPES = [
+    "https://www.googleapis.com/auth/gmail.settings.basic",
+    "https://www.googleapis.com/auth/gmail.labels"
+].join(" ");
 
 export function initGapiClient() {
     return new Promise((resolve, reject) => {
@@ -28,6 +31,12 @@ export function signIn() {
 
 export function listFilters() {
     return gapi.client.gmail.users.settings.filters.list({
+        userId: "me",
+    });
+}
+
+export function listLabels() {
+    return gapi.client.gmail.users.labels.list({
         userId: "me",
     });
 }
