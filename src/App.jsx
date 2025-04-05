@@ -10,6 +10,7 @@ import './App.css'
 function App() {
 
   const [filters, setFilters] = useState([]);
+  const [filtersTree, setFiltersTree] = useState({});
   const [labels, setLabels] = useState([]);
 
   useEffect(()=> {
@@ -26,6 +27,40 @@ function App() {
       })
     })
   }, [])
+
+  useEffect(()=>{
+    let filtersTree = [];
+    for (let filterI in Object.entries(filters)) {
+      let filter = filters.at(filterI);
+      let filterObj = {
+        "filterId": filter.id,
+        "children": []
+      }
+      let criteria = filter.criteria?.from.split(" OR ");
+      for (let criterionI in criteria) {
+        let criterion = criteria.at(criterionI)
+        let subdomains =  criterion.split(".").reverse();
+        
+        let lastObj = filterObj;
+        for (let subdomainI in subdomains) {
+          let subdomain = subdomains.at(subdomainI)
+          let existingSubdomain = lastObj.children?.find(child => child.subdomain === subdomain)
+          if (existingSubdomain) {
+            lastObj = existingSubdomain
+            continue;
+          }
+          let newObj = {
+            "subdomain": subdomain,
+            "children": []
+          }
+          lastObj.children.push(newObj)
+          lastObj = newObj
+        }
+      }
+      filtersTree.push(filterObj)
+    }
+    setFiltersTree(filtersTree);
+  }, [filters])
   
   return (
     <>
@@ -48,7 +83,26 @@ function App() {
           </li>
         ))}
       </ul>
+      <h2>Filter Criteria Subdomain Trees</h2>
+      <ul>
+        {filtersTree.length > 0 && filtersTree.map(filterRoot => (
+          <>
+            <SubdomainNode node={filterRoot} />
+          </>
+        ))}
+      </ul>
     </>
+  )
+}
+
+function SubdomainNode({node}) {
+  return (
+    <li>
+      {node.filterId || node.subdomain}
+      <ul>
+        {node.children.map(subnode => <SubdomainNode node={subnode} />)}
+      </ul>
+    </li>
   )
 }
 
