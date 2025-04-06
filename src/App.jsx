@@ -98,6 +98,7 @@ function App() {
 function SubdomainNode({node, selected, checkboxClicked}) {
   const [hovering, setHovering] = useState(false);
   const [selectedChildren, setSelectedChildren] = useState([]);
+  const [replaceFilter, setReplaceFilter] = useState("");
   const isEndNode = node.children.length == 0
   const isRootNode = node.filterId
 
@@ -123,11 +124,13 @@ function SubdomainNode({node, selected, checkboxClicked}) {
     onMouseLeave={(e)=>toggleHover(e, false)}
     onClick={(e)=>isEndNode && checkboxClicked(!selected, node.subdomain)}
      className={"subdomain-node" + (isRootNode ? " root-node" : "") + (isEndNode ? " end-node" : "")}>
-      {node.filterId || node.subdomain}
+      {isRootNode && node.filterId}
+      {!isEndNode && "." + node.subdomain}
+      {isEndNode && node.subdomain}
       
       {selectedChildren.length > 0 &&
         <ul id="selectedNodes">
-          <input disabled={selectedChildren.length < 2}/>
+          <input disabled={selectedChildren.length < 2} value={replaceFilter} onChange={e => setReplaceFilter(e.target.value)}/>
           <button disabled={selectedChildren.length < 2}>Replace filter(s)</button>
           {
             selectedChildren.map(subnode => <SubdomainNode selected={selectedChildren.find(child => child.subdomain === subnode.subdomain) ? true : false} checkboxClicked={handleChange} node={subnode} />)
