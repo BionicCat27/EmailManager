@@ -95,27 +95,43 @@ function App() {
   )
 }
 
-function SubdomainNode({node}) {
+function SubdomainNode({node, selected, checkboxClicked}) {
   const [hovering, setHovering] = useState(false);
-  const [selected, setSelected] = useState(false);
+  const [selectedChildren, setSelectedChildren] = useState([]);
   const isEndNode = node.children.length == 0
   const isRootNode = node.filterId
 
-  function handleClick(e) {
-    setSelected(e.target.checked)
+  function handleChange(e, subdomain) {
+    let sc = [...selectedChildren]
+    let existingSelectedChild = sc.find(child => child.subdomain === subdomain)
+    if (e.target.checked && !existingSelectedChild) {
+      let selectedChild = node.children.find(child => child.subdomain === subdomain)
+      sc.push(selectedChild)
+    } else if (!e.target.checked && existingSelectedChild) {
+      sc = sc.filter(child => child.subdomain !== subdomain)
+    }
+    setSelectedChildren(sc)
   }
+
+  function toggleHover(e, hover) {
+    setHovering(hover);
+  }
+
+  useEffect(()=> {
+    console.log("Selected children: " + JSON.stringify(selectedChildren))
+  }, [selectedChildren])
 
   return (
     <li
-    onMouseEnter={()=>setHovering(true)}
-    onMouseLeave={()=>setHovering(false)}
+    onMouseEnter={(e)=>toggleHover(e, true)}
+    onMouseLeave={(e)=>toggleHover(e, false)}
      className={"subdomain-node" + (isRootNode ? " root-node" : "") + (isEndNode ? " end-node" : "")}>
       {node.filterId || node.subdomain}
       <ul>
-        {node.children.map(subnode => <SubdomainNode node={subnode} />)}
+        {node.children.map(subnode => <SubdomainNode selected={selectedChildren.find(child => child.subdomain === subnode.subdomain) ? true : false} checkboxClicked={handleChange} node={subnode} />)}
       </ul>
       {isEndNode && (hovering || selected) && (
-        <input type="checkbox" checked={selected} onChange={handleClick}/>
+        <input type="checkbox" checked={selected} onChange={(e) => checkboxClicked(e, node.subdomain)}/>
       )}
     </li>
   )
