@@ -27,6 +27,28 @@ h1 {
   line-height: 1.1;
 }
 
+.subdomain-node {
+  padding: 0.5em;
+  border:1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  margin: 0.5em;
+  background-color: #c8a8a83a;
+}
+
+.subdomain-node :hover {
+  border-color: rgb(0,0,0);
+  background-color: rgba(255,255,255, 0.2);
+}
+
+.root-node {
+  box-shadow: 2px 3px 3px 2px rgba(0, 0, 0, 0.226);
+}
+
+.end-node {
+  display: flex;
+  align-items: center;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -39,3 +61,4 @@ h1 {
     background-color: #f9f9f9;
   }
 }
+

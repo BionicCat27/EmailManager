@@ -96,12 +96,27 @@ function App() {
 }
 
 function SubdomainNode({node}) {
+  const [hovering, setHovering] = useState(false);
+  const [selected, setSelected] = useState(false);
+  const isEndNode = node.children.length == 0
+  const isRootNode = node.filterId
+
+  function handleClick(e) {
+    setSelected(e.target.checked)
+  }
+
   return (
-    <li>
+    <li
+    onMouseEnter={()=>setHovering(true)}
+    onMouseLeave={()=>setHovering(false)}
+     className={"subdomain-node" + (isRootNode ? " root-node" : "") + (isEndNode ? " end-node" : "")}>
       {node.filterId || node.subdomain}
       <ul>
         {node.children.map(subnode => <SubdomainNode node={subnode} />)}
       </ul>
+      {isEndNode && (hovering || selected) && (
+        <input type="checkbox" checked={selected} onChange={handleClick}/>
+      )}
     </li>
   )
 }
