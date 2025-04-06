@@ -101,13 +101,13 @@ function SubdomainNode({node, selected, checkboxClicked}) {
   const isEndNode = node.children.length == 0
   const isRootNode = node.filterId
 
-  function handleChange(e, subdomain) {
+  function handleChange(checked, subdomain) {
     let sc = [...selectedChildren]
     let existingSelectedChild = sc.find(child => child.subdomain === subdomain)
-    if (e.target.checked && !existingSelectedChild) {
+    if (checked && !existingSelectedChild) {
       let selectedChild = node.children.find(child => child.subdomain === subdomain)
       sc.push(selectedChild)
-    } else if (!e.target.checked && existingSelectedChild) {
+    } else if (!checked && existingSelectedChild) {
       sc = sc.filter(child => child.subdomain !== subdomain)
     }
     setSelectedChildren(sc)
@@ -117,21 +117,31 @@ function SubdomainNode({node, selected, checkboxClicked}) {
     setHovering(hover);
   }
 
-  useEffect(()=> {
-    console.log("Selected children: " + JSON.stringify(selectedChildren))
-  }, [selectedChildren])
-
   return (
     <li
     onMouseEnter={(e)=>toggleHover(e, true)}
     onMouseLeave={(e)=>toggleHover(e, false)}
+    onClick={(e)=>isEndNode && checkboxClicked(!selected, node.subdomain)}
      className={"subdomain-node" + (isRootNode ? " root-node" : "") + (isEndNode ? " end-node" : "")}>
       {node.filterId || node.subdomain}
+      
+      {selectedChildren.length > 0 &&
+        <ul id="selectedNodes">
+          <input disabled={selectedChildren.length < 2}/>
+          <button disabled={selectedChildren.length < 2}>Replace filter(s)</button>
+          {
+            selectedChildren.map(subnode => <SubdomainNode selected={selectedChildren.find(child => child.subdomain === subnode.subdomain) ? true : false} checkboxClicked={handleChange} node={subnode} />)
+          }
+        </ul>
+      }
       <ul>
-        {node.children.map(subnode => <SubdomainNode selected={selectedChildren.find(child => child.subdomain === subnode.subdomain) ? true : false} checkboxClicked={handleChange} node={subnode} />)}
+        {
+          node.children.filter(child => !selectedChildren.includes(child))
+            .map(subnode => <SubdomainNode selected={selectedChildren.find(child => child.subdomain === subnode.subdomain) ? true : false} checkboxClicked={handleChange} node={subnode} />)
+        }
       </ul>
       {isEndNode && (hovering || selected) && (
-        <input type="checkbox" checked={selected} onChange={(e) => checkboxClicked(e, node.subdomain)}/>
+        <input type="checkbox" checked={selected} onChange={(e) => checkboxClicked(e.target.checked, node.subdomain)}/>
       )}
     </li>
   )

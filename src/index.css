@@ -49,6 +49,12 @@ h1 {
   align-items: center;
 }
 
+#selectedNodes {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  background-color: white;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
